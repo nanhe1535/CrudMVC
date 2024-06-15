@@ -1,0 +1,87 @@
+﻿@model IEnumerable<CrudMVC.Models.UserProfile>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <style>
+        .even-row {
+            background-color: #f2f2f2; /* Light grey background for even rows */
+        }
+    </style>
+</head>
+<body>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.First().Name)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Email)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Country)</th>
+                <th>@Html.DisplayNameFor(model => model.First().State)</th>
+                <th>Profile Photo</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                var item = Model.ElementAt(i);
+                var rowClass = (i % 2 == 1) ? "even-row" : "";
+                <tr class="@rowClass">
+                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Country)</td>
+                    <td>@Html.DisplayFor(modelItem => item.State)</td>
+                    <td><img src="@Url.Content("~/Uploads/" + item.ProfilePhotoPath)" alt="Profile Photo" width="50" height="50" /></td>
+                    <td><button onclick="editUserProfile(@item.Id)">Edit</button></td>
+                    <td><button onclick="deleteUserProfile(@item.Id)">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button onclick="redirectToCreate()">Create New</button>
+
+    <script>
+        function redirectToCreate() {
+            window.location.href = '@Url.Action("Create", "UserProfiles")';
+        }
+
+        function editUserProfile(id) {
+            window.location.href = '@Url.Action("Edit", "UserProfiles")/' + id;
+        }
+
+        function deleteUserProfile(id) {
+            if (confirm("Are you sure you want to delete this profile?")) {
+                $.ajax({
+                    url: '@Url.Action("Delete", "UserProfiles")/' + id,
+                    type: 'POST',
+                    success: function (result) {
+                        location.reload(); // Reload the page to see the changes
+                    }
+                });
+            }
+        }
+       function uploadFile() {
+            var formData = new FormData();
+            var fileInput = document.getElementById('file');
+            var file = fileInput.files[0];
+            formData.append('file', file);
+
+            $.ajax({
+                url: '@Url.Action("UploadFile", "UserProfiles")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    $('#message').html(response);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $('#message').html('Error: ' + errorThrown);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

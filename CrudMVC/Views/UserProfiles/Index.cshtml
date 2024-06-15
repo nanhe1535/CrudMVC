@@ -1,0 +1,41 @@
+﻿@model IEnumerable<CrudMVC.Models.UserProfile>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<div id="userProfileList">
+    @Html.Partial("_UserProfileList", Model)
+</div>
+
+<script src="~/Scripts/jquery-3.6.0.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+<script>
+    $(document).ready(function () {
+        loadUserProfiles();
+    });
+
+    function loadUserProfiles() {
+        $.ajax({
+            url: '@Url.Action("List", "UserProfiles")',
+            type: 'GET',
+            success: function (data) {
+                $('#userProfileList').html(data);
+            }
+        });
+    }
+
+    function deleteUserProfile(id) {
+        $.ajax({
+            url: '@Url.Action("Delete", "UserProfiles")/' + id,
+            type: 'POST',
+            success: function (result) {
+                loadUserProfiles();
+            }
+        });
+    }
+    function editUserProfile(id) {
+        window.location.href = '@Url.Action("Edit", "UserProfiles")/' + id;
+    }
+</script>
